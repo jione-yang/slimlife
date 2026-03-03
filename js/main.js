@@ -1,77 +1,74 @@
-// SlimLife - Main JavaScript
+// SlimLife Hawaii - Main JavaScript
 
-document.addEventListener('DOMContentLoaded', function() {
-    initMobileMenu();
-    initNavScroll();
-    initSmoothScroll();
-});
+document.addEventListener('DOMContentLoaded', function () {
 
-// Mobile Menu Toggle
-function initMobileMenu() {
+    // Sticky nav shadow on scroll
+    const nav = document.querySelector('.nav');
+    if (nav) {
+        const onScroll = () => {
+            nav.classList.toggle('scrolled', window.scrollY > 50);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    }
+
+    // Mobile hamburger menu
     const navToggle = document.querySelector('.nav-toggle');
     const navLinks = document.querySelector('.nav-links');
 
     if (navToggle && navLinks) {
-        navToggle.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
+        navToggle.addEventListener('click', () => {
             navToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
             document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
         });
 
-        // Close menu when clicking a link
-        const links = navLinks.querySelectorAll('.nav-link');
-        links.forEach(link => {
-            link.addEventListener('click', function() {
-                navLinks.classList.remove('active');
+        // Close menu on link click
+        navLinks.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
                 navToggle.classList.remove('active');
+                navLinks.classList.remove('active');
                 document.body.style.overflow = '';
             });
         });
 
-        // Close menu when clicking outside
-        document.addEventListener('click', function(e) {
+        // Close menu on outside click
+        document.addEventListener('click', (e) => {
             if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
-                navLinks.classList.remove('active');
                 navToggle.classList.remove('active');
+                navLinks.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
     }
-}
 
-// Navigation scroll effect
-function initNavScroll() {
-    const nav = document.querySelector('.nav');
+    // Fade-in on scroll
+    const fadeEls = document.querySelectorAll('.fade-in');
+    if (fadeEls.length > 0 && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
 
-    if (nav) {
-        const handleScroll = () => {
-            if (window.scrollY > 50) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll(); // Check initial state
+        fadeEls.forEach(el => observer.observe(el));
     }
-}
 
-// Smooth scroll for anchor links
-function initSmoothScroll() {
+    // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
+        anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
             if (href !== '#') {
                 e.preventDefault();
                 const target = document.querySelector(href);
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
         });
     });
-}
+
+});
